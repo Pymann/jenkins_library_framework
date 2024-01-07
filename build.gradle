@@ -1,0 +1,79 @@
+plugins {
+    id 'groovy'
+    id 'codenarc'
+}
+
+group = 'org.example'
+version = '1.0-SNAPSHOT'
+layout.buildDirectory.set(new File("$projectDir/out"))
+
+sourceSets {
+    main {
+        groovy {
+            srcDirs = ['src','vars']
+        }
+        resources {
+            srcDirs = ['resources']
+        }
+    }
+    test {
+        groovy {
+            srcDirs = ['test']
+        }
+    }
+}
+
+repositories {
+    mavenCentral()
+    maven {
+        url "https://repo.jenkins-ci.org/public/"
+    }
+}
+
+groovydoc {
+    docTitle = "jcx_lib"
+    windowTitle = "jenkins continousX shared library"
+}
+
+codenarc {
+    toolVersion = "3.3.0"
+}
+
+codenarcMain {
+    configFile = rootProject.file("config/codenarc/codenarc.groovy")
+    compilationClasspath = sourceSets.main.compileClasspath + sourceSets.main.output
+}
+
+codenarcTest {
+    configFile = rootProject.file("config/codenarc/codenarc.groovy")
+    compilationClasspath = codenarcMain.compilationClasspath + sourceSets.test.compileClasspath + sourceSets.test.output
+}
+
+dependencies {
+    implementation 'org.apache.groovy:groovy:4.0.14'
+    testImplementation platform('org.junit:junit-bom:5.9.1')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+
+    implementation 'org.apache.ivy:ivy:2.4.0'
+    implementation 'org.jenkins-ci.main:jenkins-core:2.164.1'
+    def staplerGAV = 'org.kohsuke.stapler:stapler:1.255'
+    implementation staplerGAV
+    annotationProcessor staplerGAV
+    implementation 'org.jenkins-ci.plugins.workflow:workflow-step-api:2.19@jar'
+    implementation 'org.jenkins-ci.plugins:pipeline-utility-steps:2.2.0@jar'
+
+    testImplementation 'org.spockframework:spock-core:2.4-M1-groovy-4.0'
+    testImplementation 'net.bytebuddy:byte-buddy:1.9.12'
+    testImplementation 'org.objenesis:objenesis:3.0.1'
+    testImplementation 'junit:junit:4.12'
+    testImplementation 'org.junit.vintage:junit-vintage-engine:5.4.1'
+    testImplementation 'com.lesfurets:jenkins-pipeline-unit:1.9'
+}
+
+
+test {
+    useJUnitPlatform()
+    testLogging {
+        events 'passed', 'skipped', 'failed'
+    }
+}
