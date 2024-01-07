@@ -5,7 +5,7 @@ plugins {
 
 group = 'org.example'
 version = '1.0-SNAPSHOT'
-layout.buildDirectory.set(new File("$projectDir/out"))
+layout.buildDirectory.set(layout.projectDirectory.dir("out"))
 
 sourceSets {
     main {
